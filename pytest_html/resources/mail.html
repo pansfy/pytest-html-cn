@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  　<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>${mail_title}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+    <body style="margin: 0; padding: 0;">
+        <table cellpadding="0" cellspacing="0" width="80%" style="padding: 10px; margin:10px auto; background-color:#E3E3E3; border-radius: 10px;">
+　　        <tr>
+　　            <td>
+                    <table align="center" cellpadding="0" cellspacing="0" width="90%">
+                        <tr>
+                            <td colspan="2" align="center">
+                                <img src="https://images.pansaifei.com/logo/bljt.png" height="60" alt="伯乐讲堂"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <h2 align="center">${mail_title}</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table align="center" cellpadding="0" cellspacing="5" width="80%" style="padding:10px; color:darkcyan; border-radius: 3px; border:1px solid #0cc; line-height: 2em;">
+                                    <tr>
+                                        <td colspan="2"><h2 style="text-align:center; margin: 0 0 10px;">汇总信息</h2></td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td width="50%" style="background-color:honeydew; border-radius:6px;">
+                                            <div>${mail_count}</div>
+                                            <div>用例总数</div>
+                                        </td>
+                                        <td style="background-color:honeydew; border-radius:6px;">
+                                            <div>${mail_rate}</div>
+                                            <div>通过率</div>
+                                        </td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td width="50%" style="background-color:honeydew; border-radius:6px; color:green;">
+                                            <div>${mail_passed}</div>
+                                            <div>通过</div>
+                                        </td>
+                                        <td style="background-color:honeydew; border-radius:6px; color:red;">
+                                            <div>${mail_failed}</div>
+                                            <div>失败</div>
+                                        </td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td width="50%" style="background-color:honeydew; border-radius:6px; color:orange;">
+                                            <div>${mail_xfailed}</div>
+                                            <div>预期的失败</div>
+                                        </td>
+                                        <td style="background-color:honeydew; border-radius:6px; color:red;">
+                                            <div>${mail_xpassed}</div>
+                                            <div>未知的通过</div>
+                                        </td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td width="50%" style="background-color:honeydew; border-radius:6px; color:red;">
+                                            <div>${mail_errors}</div>
+                                            <div>故障</div>
+                                        </td>
+                                        <td style="background-color:honeydew; border-radius:6px; color:orange;">
+                                            <div>${mail_skipped}</div>
+                                            <div>跳过</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" height="20px"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center" style="color:coral;">自动化测试邮件，请勿直接回复</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center" style="color:coral;">Copyright &copy; <a href="https://pansaifei.com">伯乐讲堂</a>. All rights reserved.</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
