@@ -10,7 +10,6 @@ import smtplib
 import time
 import warnings
 from base64 import b64encode, b64decode
-from collections import OrderedDict
 from email.header import Header
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
@@ -32,7 +31,6 @@ except ImportError:
 from py.xml import html, raw
 
 from . import extras
-from . import __version__, __pypi_url__
 
 
 def pytest_addhooks(pluginmanager):
@@ -55,10 +53,10 @@ def pytest_addoption(parser):
         "--self-contained-html",
         action="store_true",
         help="create a self-contained html file containing all "
-             "necessary styles, scripts, and images - this means "
-             "that the report may not render or function where CSP "
-             "restrictions are in place (see "
-             "https://developer.mozilla.org/docs/Web/Security/CSP)",
+        "necessary styles, scripts, and images - this means "
+        "that the report may not render or function where CSP "
+        "restrictions are in place (see "
+        "https://developer.mozilla.org/docs/Web/Security/CSP)",
     )
     group.addoption(
         "--css",
@@ -125,16 +123,18 @@ def data_uri(content, mime_type="text/plain", charset="utf-8"):
 
 
 class PATH:
-    """ all file PATH meta """
-    resources_path = os.path.join(os.path.dirname(__file__), 'resources')
-    mail_tmp_path = os.path.join(resources_path, 'mail.html')
+    """all file PATH meta"""
+
+    resources_path = os.path.join(os.path.dirname(__file__), "resources")
+    mail_tmp_path = os.path.join(resources_path, "mail.html")
 
 
 class MailResult:
     """
     Test run results
     """
-    title = ''
+
+    title = ""
     count = 0
     passed = 0
     xpassed = 0
@@ -151,7 +151,7 @@ TEST_ENV = {
     "Python": "Python",
     "Platform": "操作系统",
     "Packages": "依赖包",
-    "Plugins": "扩展插件"
+    "Plugins": "扩展插件",
 }
 
 TEST_STATUS = {
@@ -160,7 +160,7 @@ TEST_STATUS = {
     "XPassed": "未知的通过",
     "XFailed": "预期的失败",
     "Error": "故障",
-    "Skipped": "跳过"
+    "Skipped": "跳过",
 }
 
 
@@ -168,7 +168,7 @@ class HTMLReport:
     def __init__(self, report_file, config):
         report_file = os.path.expanduser(os.path.expandvars(report_file))
         self.report_file = os.path.abspath(report_file)
-        self.title = '测试报告'
+        self.title = "测试报告"
         self.description = "本次测试描述"
         self.results = []
         self.test_logs = []
@@ -205,7 +205,7 @@ class HTMLReport:
                 html.td(self.test_id, class_="col-name"),
                 html.td(f"{self.time:.2f}", class_="col-duration"),
                 html.td(TEST_STATUS.get(self.outcome), class_="col-result"),
-                html.td(self.links_html, class_="col-links"),
+                html.td("", class_="col-links"),
             ]
 
             self.config.hook.pytest_html_results_table_row(report=report, cells=cells)
@@ -237,7 +237,7 @@ class HTMLReport:
             return order.index(self.outcome) < order.index(other.outcome)
 
         def create_asset(
-                self, content, extra_index, test_index, file_extension, mode="w"
+            self, content, extra_index, test_index, file_extension, mode="w"
         ):
             # 255 is the common max filename length on various filesystems
             asset_file_name = "{}_{}_{}.{}".format(
@@ -336,7 +336,7 @@ class HTMLReport:
             additional_html.append(log)
 
         def _make_media_html_div(
-                self, extra, extra_index, test_index, base_extra_string, base_extra_class
+            self, extra, extra_index, test_index, base_extra_string, base_extra_class
         ):
             content = extra.get("content")
             try:
@@ -360,7 +360,12 @@ class HTMLReport:
                 href = src = self.create_asset(
                     content, extra_index, test_index, extra.get("extension"), "wb"
                 )
-                html_div = html.a(class_=base_extra_class, target="_blank", href=href)
+                html_div = html.a(
+                    raw(base_extra_string.format(src)),
+                    class_=base_extra_class,
+                    target="_blank",
+                    href=href,
+                )
             return html_div
 
         def _append_image(self, extra, extra_index, test_index):
@@ -433,7 +438,7 @@ class HTMLReport:
 
         class Outcome:
             def __init__(
-                    self, outcome, total=0, label=None, test_result=None, class_html=None
+                self, outcome, total=0, label=None, test_result=None, class_html=None
             ):
                 self.outcome = outcome
                 self.label = label or outcome
@@ -557,7 +562,7 @@ class HTMLReport:
             html_css = html.style(raw(self.style_css))
 
         head = html.head(
-            html.meta(charset="utf-8"), html.title(self.title), html_css
+            html.meta(charset="utf-8"), html.title(self.title), html_icon, html_css
         )
 
         body = html.body(
@@ -570,15 +575,27 @@ class HTMLReport:
             overview.append(html.p(html.strong("测试人员："), self.tester))
         if hasattr(self, "department"):
             overview.append(html.p(html.strong("测试中心："), self.department))
-        overview.append(html.p(html.strong("用例统计："),
-                               f"合计 {numtests} 条用例, ",
-                               f"运行时间为: {suite_time_delta:.2f} 秒, ",
-                               "生成时间为: {} {}".format(generated.strftime("%Y-%m-%d"), generated.strftime("%H:%M:%S"))))
+        overview.append(
+            html.p(
+                html.strong("用例统计："),
+                f"合计 {numtests} 条用例, ",
+                f"运行时间为: {suite_time_delta:.2f} 秒, ",
+                "生成时间为: {} {}".format(
+                    generated.strftime("%Y-%m-%d"), generated.strftime("%H:%M:%S")
+                ),
+            )
+        )
         if hasattr(self, "description"):
             overview.append(html.p(html.strong("测试描述："), self.description))
 
         overview_html = html.div(overview, id="overview")
-        body.extend([html.h1(self.title), html.h3(html.a(self.company['name'], href=self.company['url'])), overview_html])
+        body.extend(
+            [
+                html.h1(self.title),
+                html.h3(html.a(self.company["name"], href=self.company["url"])),
+                overview_html,
+            ]
+        )
         body.extend(self._generate_environment(session.config))
 
         summary_prefix, summary_postfix = [], []
@@ -589,7 +606,7 @@ class HTMLReport:
 
         body.extend(results)
 
-         # Mail Template
+        # Mail Template
         MailResult.title = self.title
         MailResult.count = numtests
         MailResult.passed = self.passed
@@ -669,8 +686,11 @@ class HTMLReport:
         report_content = self._generate_report(session)
         self._save_report(report_content)
         if session.is_email:
-            smtp = SMTP(**session.email_cfg)
-            smtp.sender(**session.send_cfg, attachments=self.report_file)
+            try:
+                smtp = SMTP(**session.email_cfg)
+                smtp.sender(**session.send_cfg, attachments=self.report_file)
+            except Exception as e:
+                print(str(e))
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.write_sep("-", f"测试已全部完成，可打开 {self.report_file} 查看报告")
@@ -690,25 +710,25 @@ class SMTP(PATH):
     def output_email(self):
         def render_template(params: dict, template: str):
             for name, value in params.items():
-                name = '${' + name + '}'
+                name = "${" + name + "}"
                 template = template.replace(name, value)
             return template
 
         resources_path = self.mail_tmp_path
         render_params = {
-            'mail_title': str(MailResult.title),
-            'mail_count': str(MailResult.count),
-            'mail_passed': str(MailResult.passed),
-            'mail_failed': str(MailResult.failed),
-            'mail_xfailed': str(MailResult.xfailed),
-            'mail_xpassed': str(MailResult.xpassed),
-            'mail_errors': str(MailResult.errors),
-            'mail_skipped': str(MailResult.skipped),
-            'mail_rate': format(MailResult.passed / MailResult.count * 100, '.1f')
+            "mail_title": str(MailResult.title),
+            "mail_count": str(MailResult.count),
+            "mail_passed": str(MailResult.passed),
+            "mail_failed": str(MailResult.failed),
+            "mail_xfailed": str(MailResult.xfailed),
+            "mail_xpassed": str(MailResult.xpassed),
+            "mail_errors": str(MailResult.errors),
+            "mail_skipped": str(MailResult.skipped),
+            "mail_rate": format(MailResult.passed / MailResult.count * 100, ".1f"),
         }
 
-        with open(resources_path, 'rb') as file:
-            body = file.read().decode('utf-8')
+        with open(resources_path, "rb") as file:
+            body = file.read().decode("utf-8")
             contents = render_template(render_params, body)
             return contents
 
@@ -730,23 +750,23 @@ class SMTP(PATH):
             contents = self.output_email()
 
         msg = MIMEMultipart()
-        msg['Subject'] = Header(subject, 'utf-8')
-        msg['From'] = self.user
+        msg["Subject"] = Header(subject, "utf-8")
+        msg["From"] = self.user
         if isinstance(to, str):
-            msg['To'] = to
+            msg["To"] = to
             recipients = [to]
         elif isinstance(to, list):
-            msg['To'] = ','.join(to)
+            msg["To"] = ",".join(to)
             recipients = to
 
         if isinstance(cc, str):
-            msg['Cc'] = cc
+            msg["Cc"] = cc
             recipients.append(cc)
         elif isinstance(cc, list):
-            msg['Cc'] = ','.join(cc)
+            msg["Cc"] = ",".join(cc)
             recipients += cc
 
-        text = MIMEText(contents, 'html', 'utf-8')
+        text = MIMEText(contents, "html", "utf-8")
         msg.attach(text)
 
         if attachments is not None:
@@ -756,16 +776,16 @@ class SMTP(PATH):
             if "/" in attachments:
                 att_name = attachments.split("/")[-1]
 
-            att = MIMEApplication(open(attachments, 'rb').read())
-            att['Content-Type'] = 'application/octet-stream'
-            att['Content-Disposition'] = 'attachment; filename="{}"'.format(att_name)
+            att = MIMEApplication(open(attachments, "rb").read())
+            att["Content-Type"] = "application/octet-stream"
+            att["Content-Disposition"] = 'attachment; filename="{}"'.format(att_name)
             msg.attach(att)
         try:
             smtp = smtplib.SMTP_SSL(self.host, self.port)
             smtp.login(self.user, self.password)
             smtp.sendmail(self.user, recipients, msg.as_string())
-            print('📧 Email sent successfully!!')
+            print("\n*** 📧 Email sent successfully!! ***\n")
         except BaseException as msg:
-            print('❌ Email failed to send!!' + str(msg))
+            raise Exception("❌ Email failed to send!!" + str(msg))
         finally:
             smtp.quit()
